@@ -20,7 +20,7 @@ var Common = require('../core/Common');
 var Bounds = require('../geometry/Bounds');
 var Axes = require('../geometry/Axes');
 
-(function() {
+(function () {
 
     Body._inertiaScale = 4;
     Body._nextCollidingGroupId = 1;
@@ -36,7 +36,7 @@ var Axes = require('../geometry/Axes');
      * @param {} options
      * @return {body} body
      */
-    Body.create = function(options) {
+    Body.create = function (options) {
         var defaults = {
             id: Common.nextId(),
             type: 'body',
@@ -114,7 +114,7 @@ var Axes = require('../geometry/Axes');
      * @param {bool} [isNonColliding=false]
      * @return {Number} Unique group index
      */
-    Body.nextGroup = function(isNonColliding) {
+    Body.nextGroup = function (isNonColliding) {
         if (isNonColliding)
             return Body._nextNonCollidingGroupId--;
 
@@ -127,7 +127,7 @@ var Axes = require('../geometry/Axes');
      * @method nextCategory
      * @return {Number} Unique category bitfield
      */
-    Body.nextCategory = function() {
+    Body.nextCategory = function () {
         Body._nextCategory = Body._nextCategory << 1;
         return Body._nextCategory;
     };
@@ -139,7 +139,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {} [options]
      */
-    var _initProperties = function(body, options) {
+    var _initProperties = function (body, options) {
         options = options || {};
 
         // init required properties (order is important)
@@ -185,7 +185,7 @@ var Axes = require('../geometry/Axes');
      * @param {} settings A property name (or map of properties and values) to set on the body.
      * @param {} value The value to set if `settings` is a single property name.
      */
-    Body.set = function(body, settings, value) {
+    Body.set = function (body, settings, value) {
         var property;
 
         if (typeof settings === 'string') {
@@ -201,44 +201,44 @@ var Axes = require('../geometry/Axes');
             value = settings[property];
             switch (property) {
 
-            case 'isStatic':
-                Body.setStatic(body, value);
-                break;
-            case 'isSleeping':
-                Sleeping.set(body, value);
-                break;
-            case 'mass':
-                Body.setMass(body, value);
-                break;
-            case 'density':
-                Body.setDensity(body, value);
-                break;
-            case 'inertia':
-                Body.setInertia(body, value);
-                break;
-            case 'vertices':
-                Body.setVertices(body, value);
-                break;
-            case 'position':
-                Body.setPosition(body, value);
-                break;
-            case 'angle':
-                Body.setAngle(body, value);
-                break;
-            case 'velocity':
-                Body.setVelocity(body, value);
-                break;
-            case 'angularVelocity':
-                Body.setAngularVelocity(body, value);
-                break;
-            case 'parts':
-                Body.setParts(body, value);
-                break;
-            case 'centre':
-                Body.setCentre(body, value);
-                break;
-            default:
-                body[property] = value;
+                case 'isStatic':
+                    Body.setStatic(body, value);
+                    break;
+                case 'isSleeping':
+                    Sleeping.set(body, value);
+                    break;
+                case 'mass':
+                    Body.setMass(body, value);
+                    break;
+                case 'density':
+                    Body.setDensity(body, value);
+                    break;
+                case 'inertia':
+                    Body.setInertia(body, value);
+                    break;
+                case 'vertices':
+                    Body.setVertices(body, value);
+                    break;
+                case 'position':
+                    Body.setPosition(body, value);
+                    break;
+                case 'angle':
+                    Body.setAngle(body, value);
+                    break;
+                case 'velocity':
+                    Body.setVelocity(body, value);
+                    break;
+                case 'angularVelocity':
+                    Body.setAngularVelocity(body, value);
+                    break;
+                case 'parts':
+                    Body.setParts(body, value);
+                    break;
+                case 'centre':
+                    Body.setCentre(body, value);
+                    break;
+                default:
+                    body[property] = value;
 
             }
         }
@@ -250,7 +250,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {bool} isStatic
      */
-    Body.setStatic = function(body, isStatic) {
+    Body.setStatic = function (body, isStatic) {
         for (var i = 0; i < body.parts.length; i++) {
             var part = body.parts[i];
             part.isStatic = isStatic;
@@ -298,7 +298,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} mass
      */
-    Body.setMass = function(body, mass) {
+    Body.setMass = function (body, mass) {
         var moment = body.inertia / (body.mass / 6);
         body.inertia = moment * (mass / 6);
         body.inverseInertia = 1 / body.inertia;
@@ -314,7 +314,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} density
      */
-    Body.setDensity = function(body, density) {
+    Body.setDensity = function (body, density) {
         Body.setMass(body, density * body.area);
         body.density = density;
     };
@@ -326,7 +326,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} inertia
      */
-    Body.setInertia = function(body, inertia) {
+    Body.setInertia = function (body, inertia) {
         body.inertia = inertia;
         body.inverseInertia = 1 / body.inertia;
     };
@@ -343,7 +343,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {vector[]} vertices
      */
-    Body.setVertices = function(body, vertices) {
+    Body.setVertices = function (body, vertices) {
         // change vertices
         if (vertices[0].body === body) {
             body.vertices = vertices;
@@ -378,7 +378,7 @@ var Axes = require('../geometry/Axes');
      * @param [body] parts
      * @param {bool} [autoHull=true]
      */
-    Body.setParts = function(body, parts, autoHull) {
+    Body.setParts = function (body, parts, autoHull) {
         var i;
 
         // add all the parts, ensuring that the first part is always the parent body
@@ -442,7 +442,7 @@ var Axes = require('../geometry/Axes');
      * @param {vector} centre
      * @param {bool} relative
      */
-    Body.setCentre = function(body, centre, relative) {
+    Body.setCentre = function (body, centre, relative) {
         if (!relative) {
             body.positionPrev.x = centre.x - (body.position.x - body.positionPrev.x);
             body.positionPrev.y = centre.y - (body.position.y - body.positionPrev.y);
@@ -462,7 +462,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {vector} position
      */
-    Body.setPosition = function(body, position) {
+    Body.setPosition = function (body, position) {
         var delta = Vector.sub(position, body.position);
         body.positionPrev.x += delta.x;
         body.positionPrev.y += delta.y;
@@ -482,7 +482,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} angle
      */
-    Body.setAngle = function(body, angle) {
+    Body.setAngle = function (body, angle) {
         var delta = angle - body.angle;
         body.anglePrev += delta;
 
@@ -504,7 +504,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {vector} velocity
      */
-    Body.setVelocity = function(body, velocity) {
+    Body.setVelocity = function (body, velocity) {
         body.positionPrev.x = body.position.x - velocity.x;
         body.positionPrev.y = body.position.y - velocity.y;
         body.velocity.x = velocity.x;
@@ -518,7 +518,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} velocity
      */
-    Body.setAngularVelocity = function(body, velocity) {
+    Body.setAngularVelocity = function (body, velocity) {
         body.anglePrev = body.angle - velocity;
         body.angularVelocity = velocity;
         body.angularSpeed = Math.abs(body.angularVelocity);
@@ -530,7 +530,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {vector} translation
      */
-    Body.translate = function(body, translation) {
+    Body.translate = function (body, translation) {
         Body.setPosition(body, Vector.add(body.position, translation));
     };
 
@@ -541,7 +541,7 @@ var Axes = require('../geometry/Axes');
      * @param {number} rotation
      * @param {vector} [point]
      */
-    Body.rotate = function(body, rotation, point) {
+    Body.rotate = function (body, rotation, point) {
         if (!point) {
             Body.setAngle(body, body.angle + rotation);
         } else {
@@ -549,7 +549,7 @@ var Axes = require('../geometry/Axes');
                 sin = Math.sin(rotation),
                 dx = body.position.x - point.x,
                 dy = body.position.y - point.y;
-                
+
             Body.setPosition(body, {
                 x: point.x + (dx * cos - dy * sin),
                 y: point.y + (dx * sin + dy * cos)
@@ -567,7 +567,7 @@ var Axes = require('../geometry/Axes');
      * @param {number} scaleY
      * @param {vector} [point]
      */
-    Body.scale = function(body, scaleX, scaleY, point) {
+    Body.scale = function (body, scaleX, scaleY, point) {
         var totalArea = 0,
             totalInertia = 0;
 
@@ -613,7 +613,7 @@ var Axes = require('../geometry/Axes');
         }
 
         // handle circles
-        if (body.circleRadius) { 
+        if (body.circleRadius) {
             if (scaleX === scaleY) {
                 body.circleRadius *= scaleX;
             } else {
@@ -631,7 +631,7 @@ var Axes = require('../geometry/Axes');
      * @param {number} timeScale
      * @param {number} correction
      */
-    Body.update = function(body, deltaTime, timeScale, correction) {
+    Body.update = function (body, deltaTime, timeScale, correction) {
         var deltaTimeSquared = Math.pow(deltaTime * timeScale * body.timeScale, 2);
 
         // from the previous step
@@ -647,11 +647,11 @@ var Axes = require('../geometry/Axes');
         body.positionPrev.y = body.position.y;
         body.position.x += body.velocity.x;
         body.position.y += body.velocity.y;
-
+        if (!body.angle) body.angle = 0;
         // update angular velocity with Verlet integration
         body.angularVelocity = ((body.angle - body.anglePrev) * frictionAir * correction) + (body.torque / body.inertia) * deltaTimeSquared;
         body.anglePrev = body.angle;
-        body.angle += body.angularVelocity;
+        body.angle += body.angularVelocity || 0;
 
         // track speed and acceleration
         body.speed = Vector.magnitude(body.velocity);
@@ -662,7 +662,7 @@ var Axes = require('../geometry/Axes');
             var part = body.parts[i];
 
             Vertices.translate(part.vertices, body.velocity);
-            
+
             if (i > 0) {
                 part.position.x += body.velocity.x;
                 part.position.y += body.velocity.y;
@@ -687,7 +687,7 @@ var Axes = require('../geometry/Axes');
      * @param {vector} position
      * @param {vector} force
      */
-    Body.applyForce = function(body, position, force) {
+    Body.applyForce = function (body, position, force) {
         body.force.x += force.x;
         body.force.y += force.y;
         var offset = { x: position.x - body.position.x, y: position.y - body.position.y };
@@ -701,7 +701,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @return {}
      */
-    Body._totalProperties = function(body) {
+    Body._totalProperties = function (body) {
         // from equations at:
         // https://ecourses.ou.edu/cgi-bin/ebook.cgi?doc=&topic=st&chap_sec=07.2&page=theory
         // http://output.to/sideway/default.asp?qno=121100087
@@ -1147,7 +1147,7 @@ var Axes = require('../geometry/Axes');
      * @property render.sprite.texture
      * @type string
      */
-     
+
     /**
      * A `Number` that defines the scaling in the x-axis for the sprite, if any.
      *
@@ -1215,7 +1215,7 @@ var Axes = require('../geometry/Axes');
      * @property axes
      * @type vector[]
      */
-     
+
     /**
      * A `Number` that _measures_ the area of the body's convex hull, calculated at creation by `Body.create`.
      *
