@@ -1,5 +1,5 @@
 /*!
- * tooqingmatter-js 0.0.1 by @liabru 2021-01-12
+ * tooqingmatter-js 0.0.9 by @liabru 2021-01-13
  * http://brm.io/matter-js/
  * License MIT
  * 
@@ -2602,7 +2602,8 @@ var Axes = __webpack_require__(15);
      * @param {number} mass
      */
     Body.setMass = function (body, mass) {
-        var moment = body.inertia / (body.mass / 6);
+        // var moment = body.inertia / (body.mass / 6);
+        var moment = body.inertia / (mass / 6);
         body.inertia = moment * (mass / 6);
         body.inverseInertia = 1 / body.inertia;
 
@@ -2769,7 +2770,6 @@ var Axes = __webpack_require__(15);
         var delta = Vector.sub(position, body.position);
         body.positionPrev.x += delta.x;
         body.positionPrev.y += delta.y;
-
         for (var i = 0; i < body.parts.length; i++) {
             var part = body.parts[i];
             part.position.x += delta.x;
@@ -2786,19 +2786,19 @@ var Axes = __webpack_require__(15);
      * @param {number} angle
      */
     Body.setAngle = function (body, angle) {
-        var delta = angle - body.angle;
-        body.anglePrev += delta;
+        // var delta = angle - body.angle;
+        // body.anglePrev += delta;
 
-        for (var i = 0; i < body.parts.length; i++) {
-            var part = body.parts[i];
-            part.angle += delta;
-            Vertices.rotate(part.vertices, delta, body.position);
-            Axes.rotate(part.axes, delta);
-            Bounds.update(part.bounds, part.vertices, body.velocity);
-            if (i > 0) {
-                Vector.rotateAbout(part.position, delta, body.position, part.position);
-            }
-        }
+        // for (var i = 0; i < body.parts.length; i++) {
+        //     var part = body.parts[i];
+        //     part.angle += delta;
+        //     Vertices.rotate(part.vertices, delta, body.position);
+        //     Axes.rotate(part.axes, delta);
+        //     Bounds.update(part.bounds, part.vertices, body.velocity);
+        //     if (i > 0) {
+        //         Vector.rotateAbout(part.position, delta, body.position, part.position);
+        //     }
+        // }
     };
 
     /**
@@ -2822,9 +2822,9 @@ var Axes = __webpack_require__(15);
      * @param {number} velocity
      */
     Body.setAngularVelocity = function (body, velocity) {
-        body.anglePrev = body.angle - velocity;
-        body.angularVelocity = velocity;
-        body.angularSpeed = Math.abs(body.angularVelocity);
+        // body.anglePrev = body.angle - velocity;
+        // body.angularVelocity = velocity;
+        // body.angularSpeed = Math.abs(body.angularVelocity);
     };
 
     /**
@@ -7885,7 +7885,7 @@ var Vector = __webpack_require__(2);
 var Common = __webpack_require__(0);
 var Bounds = __webpack_require__(1);
 
-(function() {
+(function () {
 
     Resolver._restingThresh = 4;
     Resolver._restingThreshTangent = 6;
@@ -7898,7 +7898,7 @@ var Bounds = __webpack_require__(1);
      * @method preSolvePosition
      * @param {pair[]} pairs
      */
-    Resolver.preSolvePosition = function(pairs) {
+    Resolver.preSolvePosition = function (pairs) {
         var i,
             pair,
             activeCount;
@@ -7906,10 +7906,10 @@ var Bounds = __webpack_require__(1);
         // find total contacts on each body
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
-            
+
             if (!pair.isActive)
                 continue;
-            
+
             activeCount = pair.activeContacts.length;
             pair.collision.parentA.totalContacts += activeCount;
             pair.collision.parentB.totalContacts += activeCount;
@@ -7922,7 +7922,7 @@ var Bounds = __webpack_require__(1);
      * @param {pair[]} pairs
      * @param {number} timeScale
      */
-    Resolver.solvePosition = function(pairs, timeScale) {
+    Resolver.solvePosition = function (pairs, timeScale) {
         var i,
             pair,
             collision,
@@ -7941,7 +7941,7 @@ var Bounds = __webpack_require__(1);
         // find impulses required to resolve penetration
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
-            
+
             if (!pair.isActive || pair.isSensor)
                 continue;
 
@@ -7951,19 +7951,19 @@ var Bounds = __webpack_require__(1);
             normal = collision.normal;
 
             // get current separation between body edges involved in collision
-            bodyBtoA = Vector.sub(Vector.add(bodyB.positionImpulse, bodyB.position, tempA), 
-                Vector.add(bodyA.positionImpulse, 
+            bodyBtoA = Vector.sub(Vector.add(bodyB.positionImpulse, bodyB.position, tempA),
+                Vector.add(bodyA.positionImpulse,
                     Vector.sub(bodyB.position, collision.penetration, tempB), tempC), tempD);
 
             pair.separation = Vector.dot(normal, bodyBtoA);
         }
-        
+
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
 
             if (!pair.isActive || pair.isSensor)
                 continue;
-            
+
             collision = pair.collision;
             bodyA = collision.parentA;
             bodyB = collision.parentB;
@@ -7972,7 +7972,7 @@ var Bounds = __webpack_require__(1);
 
             if (bodyA.isStatic || bodyB.isStatic)
                 positionImpulse *= 2;
-            
+
             if (!(bodyA.isStatic || bodyA.isSleeping)) {
                 contactShare = Resolver._positionDampen / bodyA.totalContacts;
                 bodyA.positionImpulse.x += normal.x * positionImpulse * contactShare;
@@ -7992,7 +7992,7 @@ var Bounds = __webpack_require__(1);
      * @method postSolvePosition
      * @param {body[]} bodies
      */
-    Resolver.postSolvePosition = function(bodies) {
+    Resolver.postSolvePosition = function (bodies) {
         for (var i = 0; i < bodies.length; i++) {
             var body = bodies[i];
 
@@ -8031,7 +8031,7 @@ var Bounds = __webpack_require__(1);
      * @method preSolveVelocity
      * @param {pair[]} pairs
      */
-    Resolver.preSolveVelocity = function(pairs) {
+    Resolver.preSolveVelocity = function (pairs) {
         var i,
             j,
             pair,
@@ -8048,13 +8048,13 @@ var Bounds = __webpack_require__(1);
             offset,
             impulse = Vector._temp[0],
             tempA = Vector._temp[1];
-        
+
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
-            
+
             if (!pair.isActive || pair.isSensor)
                 continue;
-            
+
             contacts = pair.activeContacts;
             collision = pair.collision;
             bodyA = collision.parentA;
@@ -8073,7 +8073,7 @@ var Bounds = __webpack_require__(1);
                     // total impulse from contact
                     impulse.x = (normal.x * normalImpulse) + (tangent.x * tangentImpulse);
                     impulse.y = (normal.y * normalImpulse) + (tangent.y * tangentImpulse);
-                    
+
                     // apply impulse from contact
                     if (!(bodyA.isStatic || bodyA.isSleeping)) {
                         offset = Vector.sub(contactVertex, bodyA.position, tempA);
@@ -8099,7 +8099,7 @@ var Bounds = __webpack_require__(1);
      * @param {pair[]} pairs
      * @param {number} timeScale
      */
-    Resolver.solveVelocity = function(pairs, timeScale) {
+    Resolver.solveVelocity = function (pairs, timeScale) {
         var timeScaleSquared = timeScale * timeScale,
             impulse = Vector._temp[0],
             tempA = Vector._temp[1],
@@ -8107,13 +8107,13 @@ var Bounds = __webpack_require__(1);
             tempC = Vector._temp[3],
             tempD = Vector._temp[4],
             tempE = Vector._temp[5];
-        
+
         for (var i = 0; i < pairs.length; i++) {
             var pair = pairs[i];
-            
+
             if (!pair.isActive || pair.isSensor)
                 continue;
-            
+
             var collision = pair.collision,
                 bodyA = collision.parentA,
                 bodyB = collision.parentB,
@@ -8137,7 +8137,7 @@ var Bounds = __webpack_require__(1);
                     offsetA = Vector.sub(contactVertex, bodyA.position, tempA),
                     offsetB = Vector.sub(contactVertex, bodyB.position, tempB),
                     velocityPointA = Vector.add(bodyA.velocity, Vector.mult(Vector.perp(offsetA), bodyA.angularVelocity), tempC),
-                    velocityPointB = Vector.add(bodyB.velocity, Vector.mult(Vector.perp(offsetB), bodyB.angularVelocity), tempD), 
+                    velocityPointB = Vector.add(bodyB.velocity, Vector.mult(Vector.perp(offsetB), bodyB.angularVelocity), tempD),
                     relativeVelocity = Vector.sub(velocityPointA, velocityPointB, tempE),
                     normalVelocity = Vector.dot(normal, relativeVelocity);
 
@@ -8148,7 +8148,8 @@ var Bounds = __webpack_require__(1);
                 // raw impulses
                 var normalImpulse = (1 + pair.restitution) * normalVelocity,
                     normalForce = Common.clamp(pair.separation + normalVelocity, 0, 1) * Resolver._frictionNormalMultiplier;
-
+                console.log("normalImpulse ====>", normalImpulse);
+                if (normalImpulse === NaN) normalImpulse = 1;
                 // coulomb friction
                 var tangentImpulse = tangentVelocity,
                     maxFriction = Infinity;
@@ -8164,7 +8165,7 @@ var Bounds = __webpack_require__(1);
                 // modify impulses accounting for mass, inertia and offset
                 var oAcN = Vector.cross(offsetA, normal),
                     oBcN = Vector.cross(offsetB, normal),
-                    share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN  + bodyB.inverseInertia * oBcN * oBcN);
+                    share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN + bodyB.inverseInertia * oBcN * oBcN);
 
                 normalImpulse *= share;
                 tangentImpulse *= share;
@@ -8196,7 +8197,7 @@ var Bounds = __webpack_require__(1);
                 // total impulse from contact
                 impulse.x = (normal.x * normalImpulse) + (tangent.x * tangentImpulse);
                 impulse.y = (normal.y * normalImpulse) + (tangent.y * tangentImpulse);
-                
+
                 // apply impulse from contact
                 if (!(bodyA.isStatic || bodyA.isSleeping)) {
                     bodyA.positionPrev.x += impulse.x * bodyA.inverseMass;
@@ -8919,7 +8920,7 @@ var Common = __webpack_require__(0);
      * @readOnly
      * @type {String}
      */
-    Matter.version =  true ? "0.0.1" : undefined;
+    Matter.version =  true ? "0.0.9" : undefined;
 
     /**
      * A list of plugin dependencies to be installed. These are normally set and installed through `Matter.use`.

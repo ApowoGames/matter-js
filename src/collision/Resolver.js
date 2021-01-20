@@ -13,7 +13,7 @@ var Vector = require('../geometry/Vector');
 var Common = require('../core/Common');
 var Bounds = require('../geometry/Bounds');
 
-(function() {
+(function () {
 
     Resolver._restingThresh = 4;
     Resolver._restingThreshTangent = 6;
@@ -26,7 +26,7 @@ var Bounds = require('../geometry/Bounds');
      * @method preSolvePosition
      * @param {pair[]} pairs
      */
-    Resolver.preSolvePosition = function(pairs) {
+    Resolver.preSolvePosition = function (pairs) {
         var i,
             pair,
             activeCount;
@@ -34,10 +34,10 @@ var Bounds = require('../geometry/Bounds');
         // find total contacts on each body
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
-            
+
             if (!pair.isActive)
                 continue;
-            
+
             activeCount = pair.activeContacts.length;
             pair.collision.parentA.totalContacts += activeCount;
             pair.collision.parentB.totalContacts += activeCount;
@@ -50,7 +50,7 @@ var Bounds = require('../geometry/Bounds');
      * @param {pair[]} pairs
      * @param {number} timeScale
      */
-    Resolver.solvePosition = function(pairs, timeScale) {
+    Resolver.solvePosition = function (pairs, timeScale) {
         var i,
             pair,
             collision,
@@ -69,7 +69,7 @@ var Bounds = require('../geometry/Bounds');
         // find impulses required to resolve penetration
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
-            
+
             if (!pair.isActive || pair.isSensor)
                 continue;
 
@@ -79,19 +79,19 @@ var Bounds = require('../geometry/Bounds');
             normal = collision.normal;
 
             // get current separation between body edges involved in collision
-            bodyBtoA = Vector.sub(Vector.add(bodyB.positionImpulse, bodyB.position, tempA), 
-                Vector.add(bodyA.positionImpulse, 
+            bodyBtoA = Vector.sub(Vector.add(bodyB.positionImpulse, bodyB.position, tempA),
+                Vector.add(bodyA.positionImpulse,
                     Vector.sub(bodyB.position, collision.penetration, tempB), tempC), tempD);
 
             pair.separation = Vector.dot(normal, bodyBtoA);
         }
-        
+
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
 
             if (!pair.isActive || pair.isSensor)
                 continue;
-            
+
             collision = pair.collision;
             bodyA = collision.parentA;
             bodyB = collision.parentB;
@@ -100,7 +100,7 @@ var Bounds = require('../geometry/Bounds');
 
             if (bodyA.isStatic || bodyB.isStatic)
                 positionImpulse *= 2;
-            
+
             if (!(bodyA.isStatic || bodyA.isSleeping)) {
                 contactShare = Resolver._positionDampen / bodyA.totalContacts;
                 bodyA.positionImpulse.x += normal.x * positionImpulse * contactShare;
@@ -120,7 +120,7 @@ var Bounds = require('../geometry/Bounds');
      * @method postSolvePosition
      * @param {body[]} bodies
      */
-    Resolver.postSolvePosition = function(bodies) {
+    Resolver.postSolvePosition = function (bodies) {
         for (var i = 0; i < bodies.length; i++) {
             var body = bodies[i];
 
@@ -159,7 +159,7 @@ var Bounds = require('../geometry/Bounds');
      * @method preSolveVelocity
      * @param {pair[]} pairs
      */
-    Resolver.preSolveVelocity = function(pairs) {
+    Resolver.preSolveVelocity = function (pairs) {
         var i,
             j,
             pair,
@@ -176,13 +176,13 @@ var Bounds = require('../geometry/Bounds');
             offset,
             impulse = Vector._temp[0],
             tempA = Vector._temp[1];
-        
+
         for (i = 0; i < pairs.length; i++) {
             pair = pairs[i];
-            
+
             if (!pair.isActive || pair.isSensor)
                 continue;
-            
+
             contacts = pair.activeContacts;
             collision = pair.collision;
             bodyA = collision.parentA;
@@ -201,7 +201,7 @@ var Bounds = require('../geometry/Bounds');
                     // total impulse from contact
                     impulse.x = (normal.x * normalImpulse) + (tangent.x * tangentImpulse);
                     impulse.y = (normal.y * normalImpulse) + (tangent.y * tangentImpulse);
-                    
+
                     // apply impulse from contact
                     if (!(bodyA.isStatic || bodyA.isSleeping)) {
                         offset = Vector.sub(contactVertex, bodyA.position, tempA);
@@ -227,7 +227,7 @@ var Bounds = require('../geometry/Bounds');
      * @param {pair[]} pairs
      * @param {number} timeScale
      */
-    Resolver.solveVelocity = function(pairs, timeScale) {
+    Resolver.solveVelocity = function (pairs, timeScale) {
         var timeScaleSquared = timeScale * timeScale,
             impulse = Vector._temp[0],
             tempA = Vector._temp[1],
@@ -235,13 +235,13 @@ var Bounds = require('../geometry/Bounds');
             tempC = Vector._temp[3],
             tempD = Vector._temp[4],
             tempE = Vector._temp[5];
-        
+
         for (var i = 0; i < pairs.length; i++) {
             var pair = pairs[i];
-            
+
             if (!pair.isActive || pair.isSensor)
                 continue;
-            
+
             var collision = pair.collision,
                 bodyA = collision.parentA,
                 bodyB = collision.parentB,
@@ -265,7 +265,7 @@ var Bounds = require('../geometry/Bounds');
                     offsetA = Vector.sub(contactVertex, bodyA.position, tempA),
                     offsetB = Vector.sub(contactVertex, bodyB.position, tempB),
                     velocityPointA = Vector.add(bodyA.velocity, Vector.mult(Vector.perp(offsetA), bodyA.angularVelocity), tempC),
-                    velocityPointB = Vector.add(bodyB.velocity, Vector.mult(Vector.perp(offsetB), bodyB.angularVelocity), tempD), 
+                    velocityPointB = Vector.add(bodyB.velocity, Vector.mult(Vector.perp(offsetB), bodyB.angularVelocity), tempD),
                     relativeVelocity = Vector.sub(velocityPointA, velocityPointB, tempE),
                     normalVelocity = Vector.dot(normal, relativeVelocity);
 
@@ -276,7 +276,8 @@ var Bounds = require('../geometry/Bounds');
                 // raw impulses
                 var normalImpulse = (1 + pair.restitution) * normalVelocity,
                     normalForce = Common.clamp(pair.separation + normalVelocity, 0, 1) * Resolver._frictionNormalMultiplier;
-
+                console.log("normalImpulse ====>", normalImpulse);
+                if (normalImpulse === NaN) normalImpulse = 1;
                 // coulomb friction
                 var tangentImpulse = tangentVelocity,
                     maxFriction = Infinity;
@@ -292,7 +293,7 @@ var Bounds = require('../geometry/Bounds');
                 // modify impulses accounting for mass, inertia and offset
                 var oAcN = Vector.cross(offsetA, normal),
                     oBcN = Vector.cross(offsetB, normal),
-                    share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN  + bodyB.inverseInertia * oBcN * oBcN);
+                    share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN + bodyB.inverseInertia * oBcN * oBcN);
 
                 normalImpulse *= share;
                 tangentImpulse *= share;
@@ -324,7 +325,7 @@ var Bounds = require('../geometry/Bounds');
                 // total impulse from contact
                 impulse.x = (normal.x * normalImpulse) + (tangent.x * tangentImpulse);
                 impulse.y = (normal.y * normalImpulse) + (tangent.y * tangentImpulse);
-                
+
                 // apply impulse from contact
                 if (!(bodyA.isStatic || bodyA.isSleeping)) {
                     bodyA.positionPrev.x += impulse.x * bodyA.inverseMass;

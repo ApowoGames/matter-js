@@ -299,7 +299,8 @@ var Axes = require('../geometry/Axes');
      * @param {number} mass
      */
     Body.setMass = function (body, mass) {
-        var moment = body.inertia / (body.mass / 6);
+        // var moment = body.inertia / (body.mass / 6);
+        var moment = body.inertia / (mass / 6);
         body.inertia = moment * (mass / 6);
         body.inverseInertia = 1 / body.inertia;
 
@@ -466,7 +467,6 @@ var Axes = require('../geometry/Axes');
         var delta = Vector.sub(position, body.position);
         body.positionPrev.x += delta.x;
         body.positionPrev.y += delta.y;
-
         for (var i = 0; i < body.parts.length; i++) {
             var part = body.parts[i];
             part.position.x += delta.x;
