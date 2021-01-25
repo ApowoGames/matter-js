@@ -1,5 +1,5 @@
 /*!
- * tooqingmatter-js 0.0.9 by @liabru 2021-01-13
+ * tooqingmatter-js 0.0.9 by @liabru 2021-01-25
  * http://brm.io/matter-js/
  * License MIT
  * 
@@ -2786,19 +2786,19 @@ var Axes = __webpack_require__(15);
      * @param {number} angle
      */
     Body.setAngle = function (body, angle) {
-        // var delta = angle - body.angle;
-        // body.anglePrev += delta;
+        var delta = angle - body.angle;
+        body.anglePrev += delta;
 
-        // for (var i = 0; i < body.parts.length; i++) {
-        //     var part = body.parts[i];
-        //     part.angle += delta;
-        //     Vertices.rotate(part.vertices, delta, body.position);
-        //     Axes.rotate(part.axes, delta);
-        //     Bounds.update(part.bounds, part.vertices, body.velocity);
-        //     if (i > 0) {
-        //         Vector.rotateAbout(part.position, delta, body.position, part.position);
-        //     }
-        // }
+        for (var i = 0; i < body.parts.length; i++) {
+            var part = body.parts[i];
+            part.angle += delta;
+            Vertices.rotate(part.vertices, delta, body.position);
+            Axes.rotate(part.axes, delta);
+            Bounds.update(part.bounds, part.vertices, body.velocity);
+            if (i > 0) {
+                Vector.rotateAbout(part.position, delta, body.position, part.position);
+            }
+        }
     };
 
     /**
@@ -2822,9 +2822,9 @@ var Axes = __webpack_require__(15);
      * @param {number} velocity
      */
     Body.setAngularVelocity = function (body, velocity) {
-        // body.anglePrev = body.angle - velocity;
-        // body.angularVelocity = velocity;
-        // body.angularSpeed = Math.abs(body.angularVelocity);
+        body.anglePrev = body.angle - velocity;
+        body.angularVelocity = velocity;
+        body.angularSpeed = Math.abs(body.angularVelocity);
     };
 
     /**
@@ -8148,8 +8148,7 @@ var Bounds = __webpack_require__(1);
                 // raw impulses
                 var normalImpulse = (1 + pair.restitution) * normalVelocity,
                     normalForce = Common.clamp(pair.separation + normalVelocity, 0, 1) * Resolver._frictionNormalMultiplier;
-                console.log("normalImpulse ====>", normalImpulse);
-                if (normalImpulse === NaN) normalImpulse = 1;
+
                 // coulomb friction
                 var tangentImpulse = tangentVelocity,
                     maxFriction = Infinity;
@@ -8166,6 +8165,13 @@ var Bounds = __webpack_require__(1);
                 var oAcN = Vector.cross(offsetA, normal),
                     oBcN = Vector.cross(offsetB, normal),
                     share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN + bodyB.inverseInertia * oBcN * oBcN);
+
+                if (isNaN(share) || share === Infinity) {
+                    // console.warn("#move share: ", share, bodyA.inverseMass, bodyA.inverseInertia, bodyB.inverseMass, bodyB.inverseInertia);
+                    share = 1;
+                } else {
+                    // console.log("#move share: ", share, bodyA.inverseMass, bodyA.inverseInertia, bodyB.inverseMass, bodyB.inverseInertia);
+                }
 
                 normalImpulse *= share;
                 tangentImpulse *= share;
@@ -8203,6 +8209,10 @@ var Bounds = __webpack_require__(1);
                     bodyA.positionPrev.x += impulse.x * bodyA.inverseMass;
                     bodyA.positionPrev.y += impulse.y * bodyA.inverseMass;
                     bodyA.anglePrev += Vector.cross(offsetA, impulse) * bodyA.inverseInertia;
+
+                    if (isNaN(bodyA.positionPrev.x) || isNaN(bodyA.positionPrev.y)) {
+                        console.error("#move NAN, solveVelocity()");
+                    }
                 }
 
                 if (!(bodyB.isStatic || bodyB.isSleeping)) {

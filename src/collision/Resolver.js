@@ -276,8 +276,7 @@ var Bounds = require('../geometry/Bounds');
                 // raw impulses
                 var normalImpulse = (1 + pair.restitution) * normalVelocity,
                     normalForce = Common.clamp(pair.separation + normalVelocity, 0, 1) * Resolver._frictionNormalMultiplier;
-                console.log("normalImpulse ====>", normalImpulse);
-                if (normalImpulse === NaN) normalImpulse = 1;
+
                 // coulomb friction
                 var tangentImpulse = tangentVelocity,
                     maxFriction = Infinity;
@@ -294,6 +293,13 @@ var Bounds = require('../geometry/Bounds');
                 var oAcN = Vector.cross(offsetA, normal),
                     oBcN = Vector.cross(offsetB, normal),
                     share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN + bodyB.inverseInertia * oBcN * oBcN);
+
+                if (isNaN(share) || share === Infinity) {
+                    // console.warn("#move share: ", share, bodyA.inverseMass, bodyA.inverseInertia, bodyB.inverseMass, bodyB.inverseInertia);
+                    share = 1;
+                } else {
+                    // console.log("#move share: ", share, bodyA.inverseMass, bodyA.inverseInertia, bodyB.inverseMass, bodyB.inverseInertia);
+                }
 
                 normalImpulse *= share;
                 tangentImpulse *= share;
@@ -331,6 +337,10 @@ var Bounds = require('../geometry/Bounds');
                     bodyA.positionPrev.x += impulse.x * bodyA.inverseMass;
                     bodyA.positionPrev.y += impulse.y * bodyA.inverseMass;
                     bodyA.anglePrev += Vector.cross(offsetA, impulse) * bodyA.inverseInertia;
+
+                    if (isNaN(bodyA.positionPrev.x) || isNaN(bodyA.positionPrev.y)) {
+                        console.error("#move NAN, solveVelocity()");
+                    }
                 }
 
                 if (!(bodyB.isStatic || bodyB.isSleeping)) {
