@@ -294,13 +294,6 @@ var Bounds = require('../geometry/Bounds');
                     oBcN = Vector.cross(offsetB, normal),
                     share = contactShare / (bodyA.inverseMass + bodyB.inverseMass + bodyA.inverseInertia * oAcN * oAcN + bodyB.inverseInertia * oBcN * oBcN);
 
-                if (isNaN(share) || share === Infinity) {
-                    // console.warn("#move share: ", share, bodyA.inverseMass, bodyA.inverseInertia, bodyB.inverseMass, bodyB.inverseInertia);
-                    share = 1;
-                } else {
-                    // console.log("#move share: ", share, bodyA.inverseMass, bodyA.inverseInertia, bodyB.inverseMass, bodyB.inverseInertia);
-                }
-
                 normalImpulse *= share;
                 tangentImpulse *= share;
 
